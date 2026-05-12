@@ -1,0 +1,1178 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Komunikační trenažer — divadlo, do kterého vstupujete vy</title>
+<meta name="description" content="Komunikační trenažer je interaktivní divadelní program pro školy, firmy, rodiny i komunity. Vychází z Divadla Fórum — krátké scénky, do kterých diváci sami vstupují a hledají řešení reálných situací." />
+<meta property="og:title" content="Komunikační trenažer" />
+<meta property="og:description" content="Krátká scéna. Vaše rozhodnutí. Skutečná změna. Interaktivní workshopy pro školy, firmy a rodiny." />
+<meta property="og:type" content="website" />
+<meta property="og:locale" content="cs_CZ" />
+<!-- TODO: doplnit og:image (1200×630) -->
+<!-- <meta property="og:image" content="og-image.jpg" /> -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+/* =========================================================
+   DESIGN TOKENY — barvy a typografie
+   Inspirováno divadelní paletou: hluboká zeleň jeviště,
+   teplá terakota opony, papírový krém programu.
+   ========================================================= */
+:root {
+  --ink: #15201d;
+  --ink-soft: #3a4a45;
+  --paper: #f4ecdc;       /* hlavní pozadí — teplý krém */
+  --paper-2: #ebe1cd;     /* lehce tmavší pruh */
+  --teal: #1f5f5a;        /* jevištní zeleň */
+  --teal-deep: #14403d;
+  --terra: #c2542a;       /* terakota — akcent */
+  --terra-soft: #e08a5c;
+  --ochre: #d9a441;       /* doplňkový žlutý akcent */
+  --line: #1520201a;
+  --line-strong: #15202033;
+  --display: "Instrument Serif", "Times New Roman", serif;
+  --sans: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", monospace;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+body {
+  margin: 0;
+  font-family: var(--sans);
+  font-size: 17px;
+  line-height: 1.55;
+  color: var(--ink);
+  background: var(--paper);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+img { max-width: 100%; display: block; }
+a { color: inherit; }
+button { font: inherit; cursor: pointer; }
+
+.wrap { width: min(1180px, 92%); margin: 0 auto; }
+
+/* ---------- HLAVIČKA / NAV ---------- */
+.site-header {
+  position: sticky; top: 0; z-index: 50;
+  background: color-mix(in oklab, var(--paper) 88%, transparent);
+  backdrop-filter: saturate(140%) blur(10px);
+  -webkit-backdrop-filter: saturate(140%) blur(10px);
+  border-bottom: 1px solid transparent;
+  transition: border-color .2s, background .2s;
+}
+.site-header.is-scrolled { border-bottom-color: var(--line); }
+.nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 0;
+}
+.brand {
+  display: inline-flex; align-items: center; gap: 12px;
+  text-decoration: none; color: var(--ink);
+  font-family: var(--display); font-size: 22px; line-height: 1;
+}
+.brand-mark {
+  width: 36px; height: 36px; flex: 0 0 36px;
+  display: grid; place-items: center;
+  background: var(--teal); color: var(--paper);
+  border-radius: 50%;
+  font-family: var(--display); font-style: italic; font-size: 22px;
+  letter-spacing: -.02em;
+  box-shadow: 2px 2px 0 var(--terra);
+}
+.brand small {
+  display: block;
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-top: 2px;
+}
+.nav-list {
+  display: flex; gap: 26px; list-style: none; margin: 0; padding: 0;
+}
+.nav-list a {
+  font-size: 14px; font-weight: 500;
+  text-decoration: none; color: var(--ink);
+  padding: 6px 2px;
+  border-bottom: 1.5px solid transparent;
+  transition: border-color .15s, color .15s;
+}
+.nav-list a:hover, .nav-list a.is-active {
+  border-bottom-color: var(--terra);
+}
+.nav-cta {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--ink); color: var(--paper);
+  text-decoration: none;
+  padding: 10px 16px; border-radius: 999px;
+  font-size: 14px; font-weight: 600;
+  transition: transform .15s, background .15s;
+}
+.nav-cta:hover { background: var(--teal); transform: translateY(-1px); }
+.nav-toggle { display: none; background: none; border: 0; padding: 8px; }
+.nav-toggle span { display: block; width: 22px; height: 2px; background: var(--ink); margin: 5px 0; transition: transform .2s, opacity .2s; }
+.nav-toggle.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-toggle.open span:nth-child(2) { opacity: 0; }
+.nav-toggle.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+@media (max-width: 900px) {
+  .nav-list, .nav-cta { display: none; }
+  .nav-toggle { display: block; }
+  .site-header.is-open .nav-list,
+  .site-header.is-open .nav-cta {
+    display: flex;
+    position: absolute; top: 100%; left: 0; right: 0;
+    background: var(--paper);
+    border-bottom: 1px solid var(--line);
+  }
+  .site-header.is-open .nav-list {
+    flex-direction: column; gap: 0; padding: 8px 5% 0;
+  }
+  .site-header.is-open .nav-list li { border-top: 1px solid var(--line); }
+  .site-header.is-open .nav-list a { display: block; padding: 14px 4px; font-size: 16px; }
+  .site-header.is-open .nav-cta {
+    margin: 12px 5% 18px;
+    justify-content: center;
+  }
+}
+
+/* ---------- HERO ---------- */
+.hero {
+  position: relative; overflow: hidden;
+  padding: 72px 0 96px;
+}
+.hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr);
+  gap: 56px; align-items: end;
+}
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: var(--mono); font-size: 11px; font-weight: 500;
+  letter-spacing: .18em; text-transform: uppercase;
+  color: var(--teal);
+}
+.eyebrow::before {
+  content: ""; width: 22px; height: 1.5px; background: var(--terra);
+}
+.hero h1 {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(44px, 7vw, 92px);
+  line-height: .98;
+  letter-spacing: -.015em;
+  margin: 18px 0 24px;
+}
+.hero h1 em {
+  font-style: italic;
+  color: var(--terra);
+}
+.hero h1 .strike {
+  position: relative; display: inline-block;
+}
+.hero h1 .strike::after {
+  content: "";
+  position: absolute; left: -4%; right: -4%; top: 58%;
+  height: 6px; background: var(--ochre);
+  transform: skew(-6deg); opacity: .55;
+  z-index: -1;
+}
+.hero-lead {
+  font-size: 19px; line-height: 1.5;
+  color: var(--ink-soft);
+  max-width: 56ch;
+  margin: 0 0 32px;
+}
+.hero-ctas { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+.btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 16px 24px; border-radius: 999px;
+  font-weight: 600; text-decoration: none;
+  border: 1.5px solid transparent;
+  transition: transform .15s, background .15s, color .15s, border-color .15s;
+}
+.btn-primary { background: var(--terra); color: #fff; }
+.btn-primary:hover { background: var(--teal); transform: translateY(-1px); }
+.btn-ghost { color: var(--ink); border-color: var(--line-strong); background: transparent; }
+.btn-ghost:hover { border-color: var(--ink); }
+.btn .arrow { transition: transform .15s; }
+.btn:hover .arrow { transform: translateX(3px); }
+
+/* HERO — pravá strana: placeholder úvodní fotografie */
+.hero-photo {
+  position: relative;
+  background: var(--paper-2);
+  border: 1px dashed var(--line-strong);
+  border-radius: 18px;
+  min-height: 440px;
+  overflow: hidden;
+  display: grid; place-items: center;
+  box-shadow: 8px 8px 0 var(--terra);
+}
+.hero-photo::before {
+  content: ""; position: absolute; inset: 0;
+  background-image: repeating-linear-gradient(45deg, transparent 0 10px, #15201008 10px 11px);
+  pointer-events: none;
+}
+.hero-photo-label {
+  font-family: var(--mono); font-size: 12px;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--ink-soft);
+  position: relative;
+}
+.hero-photo-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+@media (max-width: 900px) {
+  .hero { padding: 40px 0 60px; }
+  .hero-grid { grid-template-columns: 1fr; gap: 36px; }
+  .hero-photo { min-height: 280px; }
+}
+
+/* ---------- BĚŽÍCÍ PRUH ---------- */
+.marquee {
+  background: var(--ink); color: var(--paper);
+  overflow: hidden; padding: 14px 0;
+  border-top: 1px solid #ffffff10;
+}
+.marquee-track {
+  display: flex; gap: 48px;
+  white-space: nowrap;
+  animation: marq 38s linear infinite;
+  font-family: var(--display); font-size: 22px; font-style: italic;
+}
+.marquee-track span { display: inline-flex; align-items: center; gap: 48px; }
+.marquee-track span::after {
+  content: "✦"; color: var(--terra); font-style: normal;
+}
+@keyframes marq { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* ---------- SEKCE ---------- */
+section { padding: 96px 0; position: relative; }
+.section-head {
+  display: grid;
+  grid-template-columns: minmax(0, 220px) minmax(0, 1fr);
+  gap: 48px;
+  margin-bottom: 56px;
+  align-items: end;
+}
+.section-num {
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: .2em; text-transform: uppercase;
+  color: var(--terra);
+}
+.section-num em {
+  display: block;
+  font-family: var(--display); font-style: italic;
+  font-size: 56px;
+  color: var(--ink);
+  line-height: 1;
+  margin-top: 8px;
+  letter-spacing: -.02em;
+}
+.section-title {
+  font-family: var(--display); font-weight: 400;
+  font-size: clamp(34px, 4.4vw, 56px);
+  line-height: 1.02;
+  letter-spacing: -.015em;
+  margin: 0;
+  text-wrap: pretty;
+}
+.section-title em { font-style: italic; color: var(--terra); }
+@media (max-width: 760px) {
+  section { padding: 64px 0; }
+  .section-head { grid-template-columns: 1fr; gap: 12px; margin-bottom: 36px; }
+  .section-num em { font-size: 40px; }
+}
+
+/* ---------- O NÁS ---------- */
+#o-nas {
+  background: var(--paper-2);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.about-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr);
+  gap: 64px;
+  align-items: start;
+}
+.about-text p {
+  font-size: 18px; line-height: 1.65; color: var(--ink-soft);
+  margin: 0 0 18px;
+}
+.about-text p:first-child::first-letter {
+  font-family: var(--display);
+  font-size: 64px;
+  float: left;
+  line-height: .85;
+  padding: 6px 10px 0 0;
+  color: var(--terra);
+}
+.principles { display: grid; gap: 14px; }
+.principle {
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  gap: 18px; align-items: start;
+  padding: 22px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+.principle-num {
+  font-family: var(--display); font-style: italic;
+  font-size: 36px; line-height: 1;
+  color: var(--terra);
+}
+.principle h4 { margin: 0 0 6px; font-size: 17px; font-weight: 600; }
+.principle p { margin: 0; font-size: 14.5px; color: var(--ink-soft); line-height: 1.5; }
+@media (max-width: 760px) {
+  .about-grid { grid-template-columns: 1fr; gap: 32px; }
+}
+
+/* ---------- NABÍDKA ---------- */
+.offer-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+.offer-card {
+  padding: 28px 24px 24px;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  display: flex; flex-direction: column;
+  gap: 14px;
+  transition: transform .2s, background .2s, border-color .2s;
+}
+.offer-card:hover { transform: translateY(-3px); background: var(--paper); border-color: var(--line-strong); }
+.offer-card .glyph {
+  width: 52px; height: 52px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--terra); color: #fff;
+  font-family: var(--display); font-style: italic; font-size: 26px;
+}
+.offer-card.alt .glyph { background: var(--teal); }
+.offer-card.alt2 .glyph { background: var(--ochre); color: var(--ink); }
+.offer-card h3 { margin: 0; font-family: var(--display); font-size: 26px; font-weight: 400; letter-spacing: -.01em; }
+.offer-card p { margin: 0; color: var(--ink-soft); font-size: 15px; line-height: 1.55; }
+.offer-flow {
+  margin-top: 32px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--paper-2);
+}
+.flow-step {
+  padding: 24px 20px;
+  border-right: 1px solid var(--line);
+  position: relative;
+}
+.flow-step:last-child { border-right: 0; }
+.flow-step .step-num {
+  font-family: var(--mono); font-size: 11px; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--terra);
+  margin-bottom: 8px;
+}
+.flow-step h4 { margin: 0 0 6px; font-family: var(--display); font-size: 22px; font-weight: 400; }
+.flow-step p { margin: 0; font-size: 13.5px; color: var(--ink-soft); line-height: 1.5; }
+@media (max-width: 900px) { .offer-grid { grid-template-columns: 1fr 1fr; } .offer-flow { grid-template-columns: 1fr 1fr; } .flow-step { border-bottom: 1px solid var(--line); } .flow-step:nth-child(2) { border-right: 0; } }
+@media (max-width: 540px) { .offer-grid { grid-template-columns: 1fr; } .offer-flow { grid-template-columns: 1fr; } .flow-step { border-right: 0; border-bottom: 1px solid var(--line); } .flow-step:last-child { border-bottom: 0; } }
+
+/* ---------- NAŠE PRÁCE ---------- */
+#prace { background: var(--ink); color: var(--paper); border-radius: 0; }
+#prace .section-num { color: var(--terra-soft); }
+#prace .section-num em { color: var(--paper); }
+#prace .section-title { color: var(--paper); }
+.works {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0;
+  border-top: 1px solid #ffffff15;
+  border-left: 1px solid #ffffff15;
+}
+.work {
+  position: relative;
+  padding: 32px 28px;
+  border-right: 1px solid #ffffff15;
+  border-bottom: 1px solid #ffffff15;
+  display: grid;
+  grid-template-columns: 56px 1fr auto;
+  gap: 22px; align-items: start;
+  text-decoration: none; color: inherit;
+  transition: background .2s;
+}
+.work:hover { background: #ffffff08; }
+.work-num {
+  font-family: var(--display); font-style: italic;
+  font-size: 32px; line-height: 1;
+  color: var(--terra-soft);
+}
+.work-body h3 {
+  margin: 0 0 6px; font-family: var(--display);
+  font-size: 24px; font-weight: 400; letter-spacing: -.01em;
+  color: var(--paper);
+}
+.work-body p { margin: 0; font-size: 14.5px; color: #f4ecdcbb; line-height: 1.5; }
+.work-link {
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: .18em; text-transform: uppercase;
+  color: var(--terra-soft);
+  align-self: center;
+  white-space: nowrap;
+  border: 1px solid #ffffff20;
+  padding: 6px 10px;
+  border-radius: 999px;
+}
+.work:not([href]) .work-link { opacity: .4; border-style: dashed; }
+@media (max-width: 760px) {
+  .works { grid-template-columns: 1fr; border-left: 0; }
+  .work { grid-template-columns: 44px 1fr; padding: 24px 4%; }
+  .work-link { grid-column: 2; justify-self: start; margin-top: 6px; }
+}
+
+/* ---------- TÝM ---------- */
+.team {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.member {
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 20px;
+  display: flex; flex-direction: column; gap: 16px;
+  transition: transform .2s, border-color .2s;
+}
+.member:hover { transform: translateY(-3px); border-color: var(--line-strong); }
+.member-photo {
+  aspect-ratio: 4/5;
+  background: #d6cdb8;
+  border-radius: 14px;
+  overflow: hidden;
+  position: relative;
+}
+.member-photo img {
+  width: 100%; height: 100%; object-fit: cover; object-position: center 20%;
+}
+.member-photo .badge {
+  position: absolute; top: 12px; left: 12px;
+  background: var(--terra); color: #fff;
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: .14em; text-transform: uppercase;
+  padding: 5px 9px; border-radius: 999px;
+}
+.member h3 {
+  margin: 0;
+  font-family: var(--display); font-weight: 400;
+  font-size: 28px; letter-spacing: -.01em; line-height: 1.05;
+}
+.member .role {
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--terra);
+}
+.member p { margin: 0; font-size: 14.5px; color: var(--ink-soft); line-height: 1.55; }
+.member details { margin-top: -4px; }
+.member details summary {
+  cursor: pointer;
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--ink);
+  padding-top: 8px;
+  border-top: 1px dashed var(--line-strong);
+  list-style: none;
+}
+.member details summary::-webkit-details-marker { display: none; }
+.member details summary::after { content: " +"; color: var(--terra); }
+.member details[open] summary::after { content: " −"; }
+.member details p { margin-top: 10px; font-size: 14px; }
+@media (max-width: 900px) { .team { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 600px) { .team { grid-template-columns: 1fr; } }
+
+/* ---------- GALERIE ---------- */
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-auto-rows: 120px;
+  gap: 10px;
+}
+.gallery-tile {
+  background: var(--paper-2);
+  border: 1px dashed var(--line-strong);
+  border-radius: 10px;
+  position: relative; overflow: hidden;
+  display: grid; place-items: center;
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.gallery-tile::before {
+  content: ""; position: absolute; inset: 0;
+  background-image: repeating-linear-gradient(45deg, transparent 0 8px, #15201008 8px 9px);
+  pointer-events: none;
+}
+/* různé velikosti dlaždic pro vizuální rytmus */
+.gallery-tile:nth-child(1) { grid-column: span 2; grid-row: span 2; }
+.gallery-tile:nth-child(2) { grid-column: span 2; }
+.gallery-tile:nth-child(3) { grid-column: span 2; }
+.gallery-tile:nth-child(4) { grid-column: span 1; grid-row: span 2; }
+.gallery-tile:nth-child(5) { grid-column: span 3; }
+.gallery-tile:nth-child(6) { grid-column: span 2; }
+.gallery-tile:nth-child(7) { grid-column: span 3; }
+.gallery-tile:nth-child(8) { grid-column: span 3; }
+.gallery-note {
+  margin-top: 18px;
+  font-family: var(--mono); font-size: 12px;
+  color: var(--ink-soft);
+}
+@media (max-width: 760px) {
+  .gallery { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 110px; }
+  .gallery-tile:nth-child(n) { grid-column: span 1; grid-row: span 1; }
+  .gallery-tile:nth-child(1), .gallery-tile:nth-child(5) { grid-column: span 2; }
+}
+
+/* ---------- KONTAKT ---------- */
+#kontakt {
+  background: var(--teal);
+  color: var(--paper);
+  border-radius: 0;
+}
+#kontakt .section-num { color: var(--terra-soft); }
+#kontakt .section-num em, #kontakt .section-title { color: var(--paper); }
+.contact-grid {
+  display: grid;
+  grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
+  gap: 56px;
+}
+.contact-info p { color: #f4ecdcdd; line-height: 1.6; font-size: 17px; }
+.contact-info .channels { list-style: none; padding: 0; margin: 24px 0 0; display: grid; gap: 12px; }
+.contact-info .channels li { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-top: 1px solid #ffffff20; }
+.contact-info .channels li:last-child { border-bottom: 1px solid #ffffff20; }
+.contact-info .channels .ch-label {
+  font-family: var(--mono); font-size: 10px; letter-spacing: .18em;
+  text-transform: uppercase; color: var(--terra-soft);
+  width: 70px; flex: 0 0 70px;
+}
+.contact-info .channels a { color: var(--paper); text-decoration: none; font-size: 18px; font-weight: 500; }
+.contact-info .channels a:hover { color: var(--ochre); }
+
+form.contact-form {
+  background: var(--paper);
+  color: var(--ink);
+  padding: 32px;
+  border-radius: 18px;
+  box-shadow: -8px 8px 0 var(--ink);
+  display: grid; gap: 14px;
+}
+.form-row { display: grid; gap: 14px; grid-template-columns: 1fr 1fr; }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label {
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: .16em; text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.field input, .field select, .field textarea {
+  font: inherit; color: var(--ink);
+  background: var(--paper-2);
+  border: 1.5px solid transparent;
+  padding: 12px 14px; border-radius: 10px;
+  transition: border-color .15s, background .15s;
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  outline: none; border-color: var(--terra);
+  background: #fff;
+}
+.field textarea { resize: vertical; min-height: 110px; }
+.field.has-error input, .field.has-error select, .field.has-error textarea { border-color: #c0392b; }
+.field .err {
+  display: none; font-size: 12.5px; color: #c0392b; font-weight: 500;
+}
+.field.has-error .err { display: block; }
+.form-actions {
+  display: flex; justify-content: space-between; align-items: center; gap: 14px;
+  margin-top: 6px;
+}
+.form-actions .hint {
+  font-family: var(--mono); font-size: 10.5px;
+  letter-spacing: .12em; text-transform: uppercase; color: var(--ink-soft);
+}
+.btn-submit {
+  background: var(--ink); color: var(--paper);
+  border: 0; padding: 14px 22px; border-radius: 999px;
+  font-weight: 600;
+  display: inline-flex; align-items: center; gap: 10px;
+  transition: background .15s, transform .15s;
+}
+.btn-submit:hover { background: var(--terra); transform: translateY(-1px); }
+.form-success {
+  background: var(--paper);
+  color: var(--ink);
+  padding: 48px 32px;
+  border-radius: 18px;
+  box-shadow: -8px 8px 0 var(--ink);
+  text-align: center;
+}
+.form-success .check {
+  width: 56px; height: 56px; margin: 0 auto 18px;
+  border-radius: 50%;
+  background: var(--terra); color: #fff;
+  display: grid; place-items: center;
+  font-size: 28px;
+}
+.form-success h3 { font-family: var(--display); font-size: 30px; margin: 0 0 8px; font-weight: 400; }
+.form-success p { color: var(--ink-soft); margin: 0; }
+.hidden { display: none !important; }
+
+@media (max-width: 900px) {
+  .contact-grid { grid-template-columns: 1fr; gap: 36px; }
+  .form-row { grid-template-columns: 1fr; }
+}
+
+/* ---------- PATIČKA ---------- */
+.site-footer {
+  background: var(--ink); color: var(--paper);
+  padding: 36px 0 28px;
+}
+.site-footer .wrap {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 24px; flex-wrap: wrap;
+}
+.site-footer .credit {
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: #f4ecdc88;
+}
+.site-footer .top {
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--paper); text-decoration: none;
+  border: 1px solid #ffffff22; border-radius: 999px;
+  padding: 8px 14px;
+}
+.site-footer .top:hover { background: var(--terra); border-color: var(--terra); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===================== HLAVIČKA ===================== -->
+<header class="site-header" id="header">
+  <div class="wrap nav">
+    <a class="brand" href="#top" aria-label="Komunikační trenažer — úvod">
+      <span class="brand-mark" aria-hidden="true">K</span>
+      <span>
+        Komunikační trenažer
+        <small>Divadlo Fórum · CZ</small>
+      </span>
+    </a>
+    <nav aria-label="Hlavní">
+      <ul class="nav-list">
+        <li><a href="#o-nas">O nás</a></li>
+        <li><a href="#nabidka">Nabídka</a></li>
+        <li><a href="#prace">Naše práce</a></li>
+        <li><a href="#tym">Tým</a></li>
+        <li><a href="#galerie">Galerie</a></li>
+      </ul>
+    </nav>
+    <a class="nav-cta" href="#kontakt">Nezávazně poptat <span aria-hidden="true">→</span></a>
+    <button class="nav-toggle" id="navToggle" aria-label="Otevřít menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- ===================== HERO ===================== -->
+<section class="hero" aria-labelledby="hero-title">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow">Divadlo, do kterého vstupujete vy</span>
+      <!--
+        HERO CLAIM — zvolena varianta A:
+        A) "Zastavte scénu. Vstupte do ní. Zkuste to znovu." (aktuální)
+        B) "Náročný rozhovor si nejdřív zkusíme nanečisto."
+        C) "V životě jen jedna šance. Tady kolik chcete."
+      -->
+      <h1 id="hero-title">
+        Zastavte scénu.<br>
+        <em>Vstupte do ní.</em><br>
+        Zkuste to znovu.
+      </h1>
+      <p class="hero-lead">
+        Hrajeme krátké modelové scénky z reálného života — konflikty ve třídě, doma, na poradě.
+        Vy je zastavíte, vstoupíte do nich a zkusíte je odehrát po svém.
+        Bezpečně. Bez hodnocení. S divadelními lektory, kteří metodu znají přes 25 let.
+      </p>
+      <div class="hero-ctas">
+        <a class="btn btn-primary" href="#kontakt">Nezávazně poptat <span class="arrow" aria-hidden="true">→</span></a>
+        <a class="btn btn-ghost" href="#nabidka">Jak to probíhá</a>
+      </div>
+    </div>
+
+    <!--
+      ÚVODNÍ VIZUÁL — placeholder.
+      Pro doplnění úvodní fotografie nahraďte celý <div class="hero-photo"> tagem:
+      <img src="assets/hero.jpg" alt="…" class="hero-photo-img" />
+    -->
+    <div class="hero-photo" aria-label="Úvodní fotografie — doplníme později">
+      <span class="hero-photo-label">// úvodní fotografie</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== BĚŽÍCÍ PRUH ===================== -->
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-track">
+    <span>Školy</span><span>Učitelské sbory</span><span>HR a firmy</span>
+    <span>Rodiny</span><span>Páry</span><span>Komunitní akce</span>
+    <span>Budoucí lékaři</span><span>Porodní asistentky</span>
+    <span>Školy</span><span>Učitelské sbory</span><span>HR a firmy</span>
+    <span>Rodiny</span><span>Páry</span><span>Komunitní akce</span>
+    <span>Budoucí lékaři</span><span>Porodní asistentky</span>
+  </div>
+</div>
+
+<!-- ===================== O NÁS ===================== -->
+<section id="o-nas" aria-labelledby="onas-title">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-num">Sekce 01<em>O nás</em></div>
+      <h2 class="section-title" id="onas-title">Zkušebna pro situace, které venku <em>nejdou opakovat</em>.</h2>
+    </div>
+    <div class="about-grid">
+      <div class="about-text">
+        <!-- TEXT Z PODKLADŮ — sekce „O nás". Pro úpravu textu editujte odstavce níže. -->
+        <p>Komunikační trenažer vychází z principů Divadla Fórum. Jedná se o interaktivní divadelní formu, která prostřednictvím krátké inscenace nebo scénky zobrazuje situaci konfliktu, útlaku nebo nespravedlnosti. Diváci nejsou pasivními pozorovateli, ale stávají se aktivními účastníky — mohou vstupovat do děje, nahrazovat postavy a zkoušet různé způsoby řešení problémové situace.</p>
+        <p>Cílem metodiky je rozvíjet kritické myšlení, empatii a schopnost hledat konkrétní strategie změny v reálném životě. Náš komunikační trenažer se využívá ve vzdělávání, komunitní práci, prevenci sociálně-patologických jevů, firemním teambuildingu, prohlubování komunikačních dovedností a podobně, protože umožňuje bezpečně zkoumat konflikty a společně hledat možnosti jejich řešení.</p>
+      </div>
+
+      <!-- 4 principy metody — autorská strukturace textu z podkladu -->
+      <div class="principles" aria-label="Principy metody">
+        <div class="principle">
+          <div class="principle-num">01</div>
+          <div>
+            <h4>Krátká scénka místo přednášky</h4>
+            <p>Otevíráme situaci, kterou znáte. Žádné modelové ideály, žádné poučky.</p>
+          </div>
+        </div>
+        <div class="principle">
+          <div class="principle-num">02</div>
+          <div>
+            <h4>„Stop." — a vy jdete na jeviště</h4>
+            <p>Kdokoli může scénu zastavit, nahradit postavu a vyzkoušet jiné řešení.</p>
+          </div>
+        </div>
+        <div class="principle">
+          <div class="principle-num">03</div>
+          <div>
+            <h4>Bezpečný prostor, žádné hodnocení</h4>
+            <p>Lektor (joker) drží rámec. Není správná a špatná odpověď — jen víc nebo míň funkční.</p>
+          </div>
+        </div>
+        <div class="principle">
+          <div class="principle-num">04</div>
+          <div>
+            <h4>Reflexe pro skutečný život</h4>
+            <p>Z jeviště si odnášíte konkrétní strategii, kterou můžete zkusit zítra ráno.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== NABÍDKA ===================== -->
+<section id="nabidka" aria-labelledby="nabidka-title">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-num">Sekce 02<em>Nabídka</em></div>
+      <h2 class="section-title" id="nabidka-title">Pro koho připravujeme <em>trenažer na míru</em>.</h2>
+    </div>
+
+    <div class="offer-grid">
+      <div class="offer-card">
+        <div class="glyph" aria-hidden="true">Š</div>
+        <h3>Školy &amp; pedagogové</h3>
+        <p>Třídnické hodiny, sborovny, rodičovské schůzky. Náročná komunikace, prevence, klima třídy.</p>
+      </div>
+      <div class="offer-card alt">
+        <div class="glyph" aria-hidden="true">F</div>
+        <h3>Firmy &amp; týmy</h3>
+        <p>Teambuilding, který není únikovka. Konflikty v týmu, zpětná vazba, mezitýmová komunikace.</p>
+      </div>
+      <div class="offer-card alt2">
+        <div class="glyph" aria-hidden="true">R</div>
+        <h3>Rodiny, páry, komunity</h3>
+        <p>Mezigenerační neshody, partnerské domluvy, komunitní akce, festivaly, knihovny.</p>
+      </div>
+    </div>
+
+    <!-- Text z podkladů — celkový rámec nabídky -->
+    <p style="margin: 36px 0 0; max-width: 70ch; color: var(--ink-soft); font-size: 17px; line-height: 1.6;">
+      <!-- TEXT Z PODKLADŮ — sekce „Nabídka". -->
+      Komunikační trenažer nabízí pro jednotlivce, páry, skupiny, třídy, pracovní kolektivy a další možnost
+      vyzkoušet si různé způsoby řešení náročných situací — ať už preventivně, nebo těch, které se opakují.
+      Připravujeme témata vlastní, nebo přímo na zadání od vás.
+    </p>
+
+    <!-- Jak trenažer probíhá — 4 kroky -->
+    <div class="offer-flow" aria-label="Jak trenažer probíhá">
+      <div class="flow-step">
+        <div class="step-num">Krok 01</div>
+        <h4>Společně vyladíme téma</h4>
+        <p>Krátká schůzka (osobně či online), kde popíšete, co vás trápí. Z toho stavíme scénář.</p>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">Krok 02</div>
+        <h4>Odehrajeme scénku</h4>
+        <p>Tři herci, 5–10 minut. Konflikt eskaluje. Publikum sleduje, kde to začalo „skřípat".</p>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">Krok 03</div>
+        <h4>Vy vstupujete do děje</h4>
+        <p>Joker vede dialog. Kdo chce, nahradí postavu a zkusí scénu znovu — po svém.</p>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">Krok 04</div>
+        <h4>Reflexe a odnos</h4>
+        <p>Co fungovalo? Co ne? Co si odnášíte do zítřejšího dne? Délka: 90–180 min.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== NAŠE PRÁCE ===================== -->
+<section id="prace" aria-labelledby="prace-title">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-num">Sekce 03<em>Naše práce</em></div>
+      <h2 class="section-title" id="prace-title">Osm trenažerů, které jsme <em>postavili a hrajeme</em>.</h2>
+    </div>
+
+    <div class="works">
+      <!-- 1 -->
+      <a class="work" href="https://www.minor.cz/repertoar/rodinny-trenazer" target="_blank" rel="noopener">
+        <div class="work-num">01</div>
+        <div class="work-body">
+          <h3>Rodinný trenažer · divadlo Minor</h3>
+          <p>Pro rodiny s dětmi. Klasické rodinné situace, které všichni známe.</p>
+        </div>
+        <div class="work-link">minor.cz ↗</div>
+      </a>
+      <!-- 2 -->
+      <a class="work" href="https://smysluplnaskola.cz/" target="_blank" rel="noopener">
+        <div class="work-num">02</div>
+        <div class="work-body">
+          <h3>Trenažer pro pedagogy</h3>
+          <p>Komunikace s problematickým nebo náročným rodičem.</p>
+        </div>
+        <div class="work-link">smysluplnaskola.cz ↗</div>
+      </a>
+      <!-- 3 -->
+      <div class="work">
+        <div class="work-num">03</div>
+        <div class="work-body">
+          <h3>Trenažer pro porodní asistentky</h3>
+          <p>Podpora ženy během porodu a při poporodních stavech.</p>
+        </div>
+        <div class="work-link">Na vyžádání</div>
+      </div>
+      <!-- 4 -->
+      <div class="work">
+        <div class="work-num">04</div>
+        <div class="work-body">
+          <h3>Trenažer pro rodiče</h3>
+          <p>Komunikace s teenagerem.</p>
+        </div>
+        <div class="work-link">Na vyžádání</div>
+      </div>
+      <!-- 5 -->
+      <div class="work">
+        <div class="work-num">05</div>
+        <div class="work-body">
+          <h3>Trenažer pro dospívající</h3>
+          <p>Komunikace s dospělým jako s autoritou — podrývání sebedůvěry, vyvolávání strachu.</p>
+        </div>
+        <div class="work-link">Na vyžádání</div>
+      </div>
+      <!-- 6 -->
+      <div class="work">
+        <div class="work-num">06</div>
+        <div class="work-body">
+          <h3>Dítě — rodič — prarodič</h3>
+          <p>Mezigenerační trable a neshody pod jednou střechou.</p>
+        </div>
+        <div class="work-link">Na vyžádání</div>
+      </div>
+      <!-- 7 -->
+      <div class="work">
+        <div class="work-num">07</div>
+        <div class="work-body">
+          <h3>Trenažer pro páry</h3>
+          <p>Komunikace a domluvy o důležitých věcech.</p>
+        </div>
+        <div class="work-link">Na vyžádání</div>
+      </div>
+      <!-- 8 -->
+      <div class="work">
+        <div class="work-num">08</div>
+        <div class="work-body">
+          <h3>Trenažer pro budoucí lékaře</h3>
+          <p>Sdělování závažné zprávy pacientovi a rodině.</p>
+        </div>
+        <div class="work-link">Na vyžádání</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TÝM ===================== -->
+<section id="tym" aria-labelledby="tym-title">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-num">Sekce 04<em>Tým</em></div>
+      <h2 class="section-title" id="tym-title">Tři lektoři. Desítky let praxe. <em>Jeden bezpečný prostor</em>.</h2>
+    </div>
+
+    <div class="team">
+      <!-- ANDREA -->
+      <article class="member">
+        <div class="member-photo">
+          <!-- FOTKA: assets/andrea.jpg — pro výměnu uložte nový soubor pod stejným jménem -->
+          <img src="assets/andrea.jpg" alt="Andrea Marečková" />
+          <span class="badge">Lektorka</span>
+        </div>
+        <div>
+          <h3>Andrea Marečková</h3>
+          <div class="role">Herečka · režisérka · kouč</div>
+        </div>
+        <p>Propojuje divadlo s osobním rozvojem. Vychází z improvizace, práce s tělem a hereckých technik, které otevírají prostor pro autenticitu a hlubší kontakt se sebou i s druhými. Vede workshopy pro děti, dospívající i dospělé.</p>
+        <details>
+          <summary>Více o Andree</summary>
+          <p>Působila v řadě divadel, v současnosti například v divadle Minor. Několik let byla členkou společnosti Fórum pro prožitkové vzdělávání. Je absolventkou výcviku Koučink jako umění. Ve své práci využívá principy Divadla Fórum, které vnímá jako silný nástroj pro zkoumání konfliktů a obtížných situací.</p>
+        </details>
+      </article>
+
+      <!-- PETR -->
+      <article class="member">
+        <div class="member-photo">
+          <!-- FOTKA: assets/petr.jpg -->
+          <img src="assets/petr.jpg" alt="Petr Reif" />
+          <span class="badge">Lektor · režisér</span>
+        </div>
+        <div>
+          <h3>MgA. Petr Reif</h3>
+          <div class="role">Herec · improvizátor · režisér</div>
+        </div>
+        <p>Vystudoval DAMU u prof. Jana Schmida. Přes 25 let se zabývá interaktivním propojením publika s předváděným uměním. Tvůrce happeningů, teambuildingových aktivit a pojízdného kulturního prostoru „Autobuf".</p>
+        <details>
+          <summary>Více o Petrovi</summary>
+          <p>Působil či působí v divadlech Pod Palmovkou, Minor, Rubín, Drak, HaDivadlo, KoČ, ND Praha, D21, Studio Hrdinů, Komedie. Pracoval pro Fórum pro prožitkové vzdělávání, v divadle Minor spoluvytvořil a režíroval Rodinný trenažer. Je přesvědčen, že kombinace komunikačního trenažéru a Divadla Fórum je nejúčinnější preventivní i ozdravnou formou na mnohé společenské problémy.</p>
+        </details>
+      </article>
+
+      <!-- MARIANA -->
+      <article class="member">
+        <div class="member-photo">
+          <!-- FOTKA: assets/mariana.jpg -->
+          <img src="assets/mariana.jpg" alt="Mariana Čížková" />
+          <span class="badge">Lektorka · pedagožka</span>
+        </div>
+        <div>
+          <h3>MgA. Mariana Čížková, Ph.D.</h3>
+          <div class="role">Herečka · režisérka · pedagožka</div>
+        </div>
+        <p>Herectví absolvovala na DAMU u Miroslava Krobota, kde v roce 2024 obhájila i doktorát se zaměřením na tvorbu s dětmi a neherci. Více než 10 let se specializuje na přímou práci s publikem metodou Divadla Fórum.</p>
+        <details>
+          <summary>Více o Marianě</summary>
+          <p>Mezinárodní zkušenosti z Norska, UK a USA propojuje s osmi lety pedagogického působení na DAMU a režií autorských projektů (např. ND Young). Jako lektorka využívá divadlo jako nástroj pro živý dialog a společenskou reflexi. Spolupracuje s Divadeltou a divadlem Minor na Rodinném trenažéru.</p>
+        </details>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== GALERIE ===================== -->
+<section id="galerie" aria-labelledby="galerie-title">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-num">Sekce 05<em>Galerie</em></div>
+      <h2 class="section-title" id="galerie-title">Záběry ze sálu — <em>brzy doplníme</em>.</h2>
+    </div>
+
+    <!--
+      GALERIE — momentálně placeholdery.
+      Pro doplnění reálných fotek nahraďte tagem <img src="assets/galerie/01.jpg" alt="…" />.
+      Doporučený poměr stran u tile 1 a 4 je čtverec (2:2), ostatní jsou širokoúhlé (3:1 nebo 2:1).
+    -->
+    <div class="gallery" aria-label="Galerie z workshopů — placeholdery">
+      <div class="gallery-tile">01 · jeviště</div>
+      <div class="gallery-tile">02 · publikum</div>
+      <div class="gallery-tile">03 · diskuze</div>
+      <div class="gallery-tile">04 · joker</div>
+      <div class="gallery-tile">05 · skupinová práce</div>
+      <div class="gallery-tile">06 · zákulisí</div>
+      <div class="gallery-tile">07 · reflexe</div>
+      <div class="gallery-tile">08 · skupina</div>
+    </div>
+    <p class="gallery-note">// nahraďte tagem &lt;img src="assets/galerie/NN.jpg"&gt; — popisky alt jsou nutné</p>
+  </div>
+</section>
+
+<!-- ===================== KONTAKT ===================== -->
+<section id="kontakt" aria-labelledby="kontakt-title">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-num">Sekce 06<em>Kontakt</em></div>
+      <h2 class="section-title" id="kontakt-title">Napište nám, co vás <em>v životě skřípe</em>.</h2>
+    </div>
+
+    <div class="contact-grid">
+      <div class="contact-info">
+        <p>Nejlépe v pár větách popište situaci, skupinu (kdo a kolik lidí) a kdy by se mělo hrát. Ozveme se obvykle do dvou pracovních dnů — nejdřív si zavoláme, pak ladíme téma.</p>
+        <ul class="channels">
+          <li><span class="ch-label">E-mail</span><a href="mailto:reif.p@email.cz">reif.p@email.cz</a></li>
+          <li><span class="ch-label">Telefon</span><a href="tel:+420723266914">+420 723 266 914</a></li>
+          <li><span class="ch-label">Region</span><span style="color: var(--paper); font-size: 18px; font-weight: 500;">Praha &amp; celá ČR (jezdíme za vámi)</span></li>
+        </ul>
+      </div>
+
+      <form class="contact-form" id="contactForm" novalidate>
+        <div class="form-row">
+          <div class="field">
+            <label for="f-name">Jméno</label>
+            <input id="f-name" name="name" type="text" required autocomplete="name" />
+            <span class="err">Prosím doplňte jméno.</span>
+          </div>
+          <div class="field">
+            <label for="f-email">E-mail</label>
+            <input id="f-email" name="email" type="email" required autocomplete="email" />
+            <span class="err">Zkontrolujte tvar e-mailu.</span>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label for="f-group">Skupina</label>
+            <select id="f-group" name="group">
+              <option>Škola / pedagogové</option>
+              <option>Firma / tým</option>
+              <option>Rodina / pár</option>
+              <option>Komunitní akce</option>
+              <option>Jiná — popíšu níže</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="f-size">Kolik lidí</label>
+            <input id="f-size" name="size" type="text" placeholder="např. 28 žáků + 2 učitelky" />
+          </div>
+        </div>
+        <div class="field">
+          <label for="f-msg">Co vás trápí / co byste si rádi vyzkoušeli</label>
+          <textarea id="f-msg" name="message" required placeholder="Pár vět stačí — doladíme spolu."></textarea>
+          <span class="err">Napište nám pár vět o tom, co řešíte.</span>
+        </div>
+        <div class="form-actions">
+          <span class="hint">↵ Odpovíme do 2 pracovních dnů</span>
+          <button class="btn-submit" type="submit">Odeslat poptávku <span aria-hidden="true">→</span></button>
+        </div>
+      </form>
+
+      <div class="form-success hidden" id="formSuccess" role="status" aria-live="polite">
+        <div class="check" aria-hidden="true">✓</div>
+        <h3>Děkujeme, ozveme se.</h3>
+        <p>Vaši zprávu jsme dostali. Mezitím můžete prolistovat <a href="#prace" style="color: var(--terra);">naše programy</a>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ===================== PATIČKA ===================== -->
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="credit">© <span id="year"></span> Komunikační trenažer · Andrea Marečková · Petr Reif · Mariana Čížková</div>
+    <a class="top" href="#top">Nahoru ↑</a>
+  </div>
+</footer>
+
+<script>
+/* ---------- HLAVIČKA: stín při scrollu + mobilní menu ---------- */
+const header = document.getElementById('header');
+const navToggle = document.getElementById('navToggle');
+window.addEventListener('scroll', () => {
+  header.classList.toggle('is-scrolled', window.scrollY > 8);
+}, { passive: true });
+navToggle.addEventListener('click', () => {
+  const open = header.classList.toggle('is-open');
+  navToggle.classList.toggle('open', open);
+  navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+});
+// zavři menu po kliku na odkaz
+document.querySelectorAll('.nav-list a, .nav-cta').forEach(a => {
+  a.addEventListener('click', () => {
+    header.classList.remove('is-open');
+    navToggle.classList.remove('open');
+    navToggle.setAttribute('aria-expanded', 'false');
+  });
+});
+
+/* ---------- AKTIVNÍ POLOŽKA NAVU PODLE SEKCE ---------- */
+const sections = ['o-nas','nabidka','prace','tym','galerie','kontakt']
+  .map(id => document.getElementById(id));
+const navLinks = Array.from(document.querySelectorAll('.nav-list a'));
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      navLinks.forEach(l => l.classList.toggle('is-active', l.getAttribute('href') === '#' + e.target.id));
+    }
+  });
+}, { rootMargin: '-40% 0px -55% 0px' });
+sections.forEach(s => s && obs.observe(s));
+
+/* ---------- KONTAKTNÍ FORMULÁŘ: validace + úspěch ---------- */
+const form = document.getElementById('contactForm');
+const success = document.getElementById('formSuccess');
+const isEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
+  let ok = true;
+  const required = [
+    { id: 'f-name', test: (v) => v.trim().length > 1 },
+    { id: 'f-email', test: (v) => isEmail(v.trim()) },
+    { id: 'f-msg',  test: (v) => v.trim().length > 4 },
+  ];
+  required.forEach(({ id, test }) => {
+    const el = document.getElementById(id);
+    const field = el.closest('.field');
+    if (!test(el.value)) { field.classList.add('has-error'); ok = false; }
+    else field.classList.remove('has-error');
+  });
+  if (!ok) return;
+  // POZN.: zde by se odeslal request na backend / e-mail službu.
+  // Pro demo zobrazíme děkovnou obrazovku.
+  form.classList.add('hidden');
+  success.classList.remove('hidden');
+});
+// odstraň chybu při psaní
+form.querySelectorAll('input, textarea, select').forEach(el => {
+  el.addEventListener('input', () => el.closest('.field').classList.remove('has-error'));
+});
+
+/* ---------- patička: aktuální rok ---------- */
+document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+
+</body>
+</html>
